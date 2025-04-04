@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Car - Modded Motor Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for photo gallery */
+        .photo-gallery {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .main-photo-container {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .main-photo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .thumbnail:hover {
+            border-color: #4CAF50;
+        }
+
+        .thumbnail.active {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        .cover-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 10;
+        }
+
+        .nav-arrow:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .nav-arrow.left {
+            left: 15px;
+        }
+
+        .nav-arrow.right {
+            right: 15px;
+        }
+
+        .set-cover-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 10;
+            display: none;
+        }
+
+        .main-photo-container:hover .set-cover-btn {
+            display: block;
+        }
+
+        .photo-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-brand">
+            <img src="MMM.jpg" alt="Modded Motor Market Logo">
+            <div class="logo"></div>
+                </div>
+
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="listings.html"><i class="fas fa-car"></i> Listings</a></li>
+            <li><a href="sellyourcar.html"><i class="fas fa-tag"></i> Sell Your Car</a></li>
+
+            <li class="dropdown" id="accountDropdown">
+                <a href="#" id="account-link" style="display: none;">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <span id="accountText">John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="account.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                     <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
+                    <a href="saved-cars.html"><i class="fas fa-heart"></i> Saved Cars</a>
+                    <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+
+            <li>
+                <button id="auth-button">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="sellyourcar">
+        <h1>Sell Your Modded Car</h1>
+        <p>List your vehicle on the premier marketplace for modified German automobiles</p>
+
+        <div id="login-required" class="login-required">
+            <p>You must be logged in to list a car.</p>
+            <button id="show-login-modal" class="login-button">Sign In / Create Account</button>
+        </div>
+
+        <form id="sellCarForm">
+            <!-- Vehicle Information -->
+            <label for="make">Make:</label>
+            <select id="make" name="make" required>
+                <option value="">Select Make</option>
+            </select>
+
+            <label for="model">Model:</label>
+            <select id="model" name="model" required>
+                <option value="">Select Model</option>
+            </select>
+
+            <label for="year">Year:</label>
+            <select id="year" name="year" required>
+                <option value="">Select Year</option>
+            </select>
+
+            <!-- Pricing -->
+            <label for="price">Price ($):</label>
+            <input type="number" id="price" name="price" required>
+
+            <label for="mileage">Mileage:</label>
+            <input type="number" id="mileage" name="mileage" required>
+
+            <!-- Condition -->
+            <label for="condition">Condition:</label>
+            <select id="condition" name="condition" required>
+                <option value="">Select Condition</option>
+                <option value="new">Like New</option>
+                <option value="used">Gently Used</option>
+                <option value="damaged">Noticeable Damage</option>
+                <option value="parts">Part Out</option>
+            </select>
+
+            <!-- Modifications -->
+            <label for="mods">Modifications:</label>
+            <select id="mods" name="mods" required>
+                <option value="">Select Modifications</option>
+                <option value="none">None (Stock)</option>
+                <option value="performance">Performance Mods</option>
+                <option value="cosmetic">Cosmetic Mods</option>
+                <option value="both">Performance and Cosmetic</option>
+            </select>
+
+            <!-- Description -->
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" placeholder="Describe your vehicle's features, modifications, and condition..."></textarea>
+
+            <!-- Photos -->
+            <div id="photo-upload-area">
+                <label>Upload Photos:</label>
+                <input type="file" id="car-photos" name="car-photos" accept="image/*" multiple style="display: none;">
+                <button type="button" id="upload-button">Choose Files</button>
+                <div id="photo-gallery" class="photo-gallery" style="display: none;">
+                    <div class="main-photo-container">
+                        <img class="main-photo" src="" alt="Main car photo">
+                        <button type="button" class="set-cover-btn">Set as Cover</button>
+                        <div class="photo-counter">1 of 1</div>
+                        <button type="button" class="nav-arrow left"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="nav-arrow right"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="thumbnail-container"></div>
+                </div>
+                <p id="file-info">No files selected</p>
+            </div>
+
+            <button type="submit" id="submit-button">Submit Listing</button>
+        </form>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="auth-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+
+            <!-- Sign In Form -->
+            <form id="signin-form">
+                <h2>Sign In</h2>
+                <div>
+                    <label for="modal-email">Email:</label>
+                    <input type="email" id="modal-email" required>
+                </div>
+                <div>
+                    <label for="modal-password">Password:</label>
+                    <input type="password" id="modal-password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form">
+                <h2>Create Account</h2>
+                <div>
+                    <label for="signup-name">Full Name:</label>
+                    <input type="text" id="signup-name" required>
+                </div>
+                <div>
+                    <label for="signup-email">Email:</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div>
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <button type="submit">Create Account</button>
+                <p class="form-switch">Already have an account? <a href="#" id="switch-to-signin">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="auth-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-preview-modal">&times;</span>
+            <h2>Preview Your Listing</h2>
+            <div id="listing-preview">
+                <!-- Preview content will be inserted here -->
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <button id="edit-listing" style="background: #666;">Edit Listing</button>
+                <button id="confirm-listing" style="background: #4CAF50;">Post Listing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Modded Motor Market. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize mobile menu
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const accountDropdown = document.getElementById('accountDropdown');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Dropdown toggle for mobile
+            if (accountDropdown) {
+                const accountLink = document.getElementById('account-link');
+
+                accountLink.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 992) {
+                        e.preventDefault();
+                        accountDropdown.classList.toggle('active');
+                    }
+                });
+            }
+
+            // Check auth status on load
+            checkAuthStatus();
+
+            // Initialize form elements
+            const makeDropdown = document.getElementById("make");
+            const modelDropdown = document.getElementById("model");
+            const yearDropdown = document.getElementById("year");
+            const sellCarForm = document.getElementById("sellCarForm");
+            const showLoginModalBtn = document.getElementById("show-login-modal");
+            const authModal = document.getElementById("auth-modal");
+            const closeModalBtn = document.querySelector(".close-modal");
+            const signinForm = document.getElementById("signin-form");
+            const signupForm = document.getElementById("signup-form");
+            const switchToSignup = document.getElementById("switch-to-signup");
+            const switchToSignin = document.getElementById("switch-to-signin");
+            const uploadButton = document.getElementById('upload-button');
+            const fileInput = document.getElementById('car-photos');
+            const photoGallery = document.getElementById('photo-gallery');
+            const fileInfo = document.getElementById('file-info');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Show modal when login button clicked
+            showLoginModalBtn?.addEventListener("click", function() {
+                authModal.style.display = "block";
+                signinForm.style.display = "block";
+                signupForm.style.display = "none";
+            });
+
+            // Close modal
+            closeModalBtn?.addEventListener("click", function() {
+                authModal.style.display = "none";
+            });
+
+            // Close when clicking outside modal
+            window.addEventListener("click", function(event) {
+                if (event.target === authModal) {
+                    authModal.style.display = "none";
+                }
+                if (event.target === document.getElementById('preview-modal')) {
+                    document.getElementById('preview-modal').style.display = "none";
+                }
+            });
+
+            // Switch between forms
+            switchToSignup?.addEventListener("click", function(e) {
+                e.preventDefault();
+                signinForm.style.display = "none";
+                signupForm.style.display = "block";
+            });
+
+            switchToSignin?.addEventListener("click", function(e) {
+                e.preventDefault();
+                signupForm.style.display = "none";
+                signinForm.style.display = "block";
+            });
+
+            // Handle sign in form submission
+            signinForm?.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const email = document.getElementById("modal-email").value;
+                const password = document.getElementById("modal-password").value;
+                const users = JSON.parse(localStorage.getItem("users")) || [];
+
+                const user = users.find(u => u.email === email && u.password === password);
+
+                if (user) {
+                    localStorage.setItem("currentUser", JSON.stringify(user));
+                    authModal.style.display = "none";
+                    checkAuthStatus();
+                    alert("Sign in successful!");
+                } else {
+                    alert("Invalid email or password.");
+                }
+            });
+
+            // Handle sign up form submission
+            signupForm?.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const name = document.getElementById("signup-name").value;
+                const email = document.getElementById("signup-email").value;
+                const password = document.getElementById("signup-password").value;
+
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+
+                if (users.some(u => u.email === email)) {
+                    alert("Email already exists.");
+                    return;
+                }
+
+                const newUser = { 
+                    email: email, 
+                    password: password, 
+                    fullName: name 
+                };
+                users.push(newUser);
+                localStorage.setItem("users", JSON.stringify(users));
+                localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+                alert("Account created successfully!");
+                authModal.style.display = "none";
+                checkAuthStatus();
+            });
+
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('currentUser');
+                    checkAuthStatus();
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Photo Upload Functionality
+            uploadButton.addEventListener('click', () => fileInput.click());
+
+            let uploadedPhotos = [];
+            let currentPhotoIndex = 0;
+            let coverPhotoIndex = 0;
+
+            fileInput.addEventListener('change', () => {
+                const files = fileInput.files;
+
+                if (files.length === 0) {
+                    photoGallery.style.display = "none";
+                    fileInfo.textContent = 'No files selected';
+                    return;
+                }
+
+                photoGallery.style.display = "block";
+                fileInfo.textContent = `${files.length} file(s) selected`;
+
+                // Reset the uploaded photos array
+                uploadedPhotos = [];
+
+                // Process each file
+                Array.from(files).forEach(file => {
+                    if (!file.type.match('image.*')) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedPhotos.push(e.target.result);
+
+                        // If this is the last file, update the gallery
+                        if (uploadedPhotos.length === files.length) {
+                            updatePhotoGallery();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            function updatePhotoGallery() {
+                const mainPhotoContainer = document.querySelector('.main-photo-container');
+                const mainPhoto = document.querySelector('.main-photo');
+                const thumbnailContainer = document.querySelector('.thumbnail-container');
+                const photoCounter = document.querySelector('.photo-counter');
+
+                // Clear thumbnails
+                thumbnailContainer.innerHTML = '';
+
+                // Update main photo
+                mainPhoto.src = uploadedPhotos[currentPhotoIndex];
+                photoCounter.textContent = `${currentPhotoIndex + 1} of ${uploadedPhotos.length}`;
+
+                // Create thumbnails
+                uploadedPhotos.forEach((photo, index) => {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = photo;
+                    thumbnail.className = 'thumbnail' + (index === currentPhotoIndex ? ' active' : '');
+                    thumbnail.dataset.index = index;
+
+                    // Add cover badge if this is the cover photo
+                    if (index === coverPhotoIndex) {
+                        const thumbnailWrapper = document.createElement('div');
+                        thumbnailWrapper.style.position = 'relative';
+                        thumbnailWrapper.appendChild(thumbnail);
+
+                        const coverBadge = document.createElement('div');
+                        coverBadge.className = 'cover-badge';
+                        coverBadge.textContent = 'Cover';
+                        thumbnailWrapper.appendChild(coverBadge);
+
+                        thumbnailContainer.appendChild(thumbnailWrapper);
+                    } else {
+                        thumbnailContainer.appendChild(thumbnail);
+                    }
+
+                    // Add click event to thumbnails
+                    thumbnail.addEventListener('click', function() {
+                        currentPhotoIndex = parseInt(this.dataset.index);
+                        updatePhotoGallery();
+                    });
+                });
+
+                // Update navigation arrows
+                document.querySelector('.nav-arrow.left').style.display = uploadedPhotos.length > 1 ? 'flex' : 'none';
+                document.querySelector('.nav-arrow.right').style.display = uploadedPhotos.length > 1 ? 'flex' : 'none';
+            }
+
+            // Navigation arrows - prevent form submission
+            document.querySelector('.nav-arrow.left')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                currentPhotoIndex = (currentPhotoIndex - 1 + uploadedPhotos.length) % uploadedPhotos.length;
+                updatePhotoGallery();
+            });
+
+            document.querySelector('.nav-arrow.right')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                currentPhotoIndex = (currentPhotoIndex + 1) % uploadedPhotos.length;
+                updatePhotoGallery();
+            });
+
+            // Set cover photo - also prevent form submission
+            document.querySelector('.set-cover-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                coverPhotoIndex = currentPhotoIndex;
+                updatePhotoGallery();
+            });
+
+            // Fetch car brands (makes) from the API
+            fetch("/api/car-brands")
+                .then(response => response.json())
+                .then(brands => {
+                    brands.forEach(brand => {
+                        const option = document.createElement("option");
+                        option.value = brand.name;
+                        option.textContent = brand.name;
+                        makeDropdown.appendChild(option);
+                    });
+                });
+
+            // Fetch models when a brand is selected
+            makeDropdown.addEventListener("change", function () {
+                modelDropdown.innerHTML = '<option value="">Select Model</option>';
+
+                const selectedBrand = makeDropdown.value;
+                if (!selectedBrand) return;
+
+                fetch(`/api/car-models?brand=${selectedBrand}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(models => {
+                        if (Array.isArray(models)) {
+                            models.forEach(model => {
+                                const option = document.createElement("option");
+                                option.value = model.name;
+                                option.textContent = model.name;
+                                modelDropdown.appendChild(option);
+                            });
+                        } else {
+                            console.error('Models data is not an array:', models);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching models:', error);
+                    });
+            });
+
+            // Populate years dropdown
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear; i >= 1990; i--) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                yearDropdown.appendChild(option);
+            }
+
+            // Form submission handler
+            sellCarForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+                if (!currentUser) {
+                    alert("Please login to list a car");
+                    authModal.style.display = "block";
+                    return;
+                }
+
+                if (uploadedPhotos.length === 0) {
+                    alert("Please upload at least one photo of your car");
+                    return;
+                }
+
+                // Process form data for preview
+                const formData = new FormData(e.target);
+
+                // Store form data temporarily for final submission
+                const tempListing = {
+                    make: formData.get("make"),
+                    model: formData.get("model"),
+                    year: parseInt(formData.get("year")),
+                    price: parseFloat(formData.get("price")),
+                    mileage: parseInt(formData.get("mileage")),
+                    condition: formData.get("condition"),
+                    modifications: formData.get("mods"),
+                    description: formData.get("description"),
+                    photos: uploadedPhotos,
+                    coverPhotoIndex: coverPhotoIndex
+                };
+
+                // Show preview modal
+                showPreviewModal(tempListing);
+            });
+
+            // Show preview modal with listing data
+            function showPreviewModal(listing) {
+                const previewModal = document.getElementById("preview-modal");
+                const previewContent = document.getElementById("listing-preview");
+
+                // Build preview HTML
+                previewContent.innerHTML = `
+                    <div id="listing-preview-images">
+                        <div class="main-photo-container" style="height: 300px;">
+                            <img class="main-photo" src="${listing.photos[listing.coverPhotoIndex]}" alt="Car preview">
+                            <div class="photo-counter">${listing.coverPhotoIndex + 1} of ${listing.photos.length}</div>
+                        </div>
+                        <div id="thumbnail-preview-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                            ${listing.photos.map((photo, index) => 
+                                `<div style="position: relative;">
+                                    <img class="thumbnail-preview" src="${photo}" alt="Thumbnail ${index + 1}" style="width: 80px; height: 60px; object-fit: cover; border: 2px solid ${index === listing.coverPhotoIndex ? '#4CAF50' : '#ddd'}; border-radius: 4px; cursor: pointer;">
+                                    ${index === listing.coverPhotoIndex ? '<div style="position: absolute; bottom: 5px; right: 5px; background-color: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px;">Cover</div>' : ''}
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div id="listing-preview-details">
+                        <div class="preview-detail">
+                            <span class="preview-label">Make:</span>
+                            <span class="preview-value">${listing.make}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Model:</span>
+                            <span class="preview-value">${listing.model}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Year:</span>
+                            <span class="preview-value">${listing.year}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Price:</span>
+                            <span class="preview-value">$${listing.price.toLocaleString()}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Mileage:</span>
+                            <span class="preview-value">${listing.mileage.toLocaleString()} miles</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Condition:</span>
+                            <span class="preview-value">${getConditionText(listing.condition)}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Modifications:</span>
+                            <span class="preview-value">${getModsText(listing.modifications)}</span>
+                        </div>
+                        <div class="preview-detail">
+                            <span class="preview-label">Description:</span>
+                            <span class="preview-value">${listing.description || "No description provided"}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Show the modal
+                previewModal.style.display = "block";
+
+                // Add event listeners for thumbnail clicks in preview
+                document.querySelectorAll('.thumbnail-preview').forEach(thumb => {
+                    thumb.addEventListener('click', function() {
+                        const mainPhoto = document.querySelector('#listing-preview-images .main-photo');
+                        mainPhoto.src = this.src;
+                    });
+                });
+
+                // Add event listeners for modal buttons
+                document.getElementById('edit-listing').addEventListener('click', function() {
+                    previewModal.style.display = "none";
+                });
+
+                document.getElementById('confirm-listing').addEventListener('click', function() {
+                    submitFinalListing(listing);
+                    previewModal.style.display = "none";
+                });
+
+                document.querySelector('.close-preview-modal').addEventListener('click', function() {
+                    previewModal.style.display = "none";
+                });
+            }
+
+            // Helper functions for condition and mods text
+            function getConditionText(condition) {
+                const conditions = {
+                    'new': 'Like New',
+                    'used': 'Gently Used',
+                    'damaged': 'Noticeable Damage',
+                    'parts': 'Part Out'
+                };
+                return conditions[condition] || condition;
+            }
+
+            function getModsText(mods) {
+                const modsText = {
+                    'none': 'None (Stock)',
+                    'performance': 'Performance Mods',
+                    'cosmetic': 'Cosmetic Mods',
+                    'both': 'Performance and Cosmetic Mods'
+                };
+                return modsText[mods] || mods;
+            }
+
+            // Final submission function
+            function submitFinalListing(listing) {
+                const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+                const finalListing = {
+                    id: Date.now().toString(),
+                    userId: currentUser.email,
+                    ...listing,
+                    createdAt: new Date().toISOString(),
+                    isSold: false
+                };
+
+                // Save to localStorage
+                const listings = JSON.parse(localStorage.getItem("listings")) || [];
+                listings.push(finalListing);
+                localStorage.setItem("listings", JSON.stringify(listings));
+
+                alert("Your car has been listed successfully!");
+                document.getElementById("sellCarForm").reset();
+                document.getElementById("photo-gallery").style.display = "none";
+                document.getElementById("file-info").textContent = 'No files selected';
+                uploadedPhotos = [];
+                currentPhotoIndex = 0;
+                coverPhotoIndex = 0;
+
+                // Redirect to listings page with filter parameters that will show this car
+                const queryParams = new URLSearchParams();
+                queryParams.append('make', finalListing.make);
+                queryParams.append('model', finalListing.model);
+                queryParams.append('year', finalListing.year);
+                queryParams.append('min-price', Math.floor(finalListing.price * 0.9)); // 10% below
+                queryParams.append('max-price', Math.ceil(finalListing.price * 1.1)); // 10% above
+                queryParams.append('newListing', 'true'); // Flag to identify new listings
+
+                window.location.href = `listings.html?${queryParams.toString()}`;
+            }
+        });
+
+        function checkAuthStatus() {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const form = document.getElementById("sellCarForm");
+            const loginPrompt = document.getElementById("login-required");
+            const submitButton = document.getElementById("submit-button");
+            const authButton = document.getElementById("auth-button");
+            const accountLink = document.getElementById("account-link");
+            const userAvatar = document.getElementById("userAvatar");
+            const accountText = document.getElementById("accountText");
+
+            if (currentUser) {
+                // User is logged in
+                form.style.display = "grid";
+                loginPrompt.style.display = "none";
+                submitButton.disabled = false;
+                if (authButton) authButton.style.display = 'none';
+                if (accountLink) {
+                    accountLink.style.display = 'flex';
+                    // Set initials for avatar
+                    const initials = currentUser.fullName ? 
+                        currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
+                    userAvatar.textContent = initials;
+                    // Set account name
+                    accountText.textContent = currentUser.fullName || 'My Account';
+                }
+            } else {
+                // User is not logged in
+                form.style.display = "none";
+                loginPrompt.style.display = "block";
+                submitButton.disabled = true;
+                if (authButton) authButton.style.display = 'flex';
+                if (accountLink) accountLink.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

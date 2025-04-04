@@ -1,0 +1,456 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modded Motor Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Google Identity Services script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* Social Login Styles */
+        .social-login {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .g_id_signin {
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        /* Modal adjustments for Google button */
+        .modal-content {
+            width: 350px;
+            max-width: 90%;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider-text {
+            padding: 0 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <img src="MMM.jpg" alt="Modded Motor Market Logo">
+            <div class="logo"></div>
+        </div>
+
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="listings.html"><i class="fas fa-car"></i> Listings</a></li>
+            <li><a href="sellyourcar.html"><i class="fas fa-tag"></i> Sell Your Car</a></li>
+           
+            <li class="dropdown" id="accountDropdown">
+                <a href="#" id="account-link" style="display: none;">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span id="accountText"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="account.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                     <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
+                    <a href="saved-cars.html"><i class="fas fa-heart"></i> Saved Cars</a>
+                    <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+
+            <li>
+                <button id="auth-button">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <!-- Sign In Form -->
+            <form id="signin-form">
+                <h2>Sign In</h2>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                
+                <div class="divider">
+                    <span class="divider-text">or</span>
+                </div>
+                
+                <div class="social-login">
+                    <div id="g_id_onload"
+                         data-client_id="685654434134-h0nmsv0e4p0q6pcdgtspnbq7uhlj09qj.apps.googleusercontent.com"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
+                
+                <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
+            </form>
+
+            <!-- Sign Up Form (hidden by default) -->
+            <form id="signup-form" style="display: none;">
+                <h2>Create Account</h2>
+                <div>
+                    <label for="full-name">Full Name:</label>
+                    <input type="text" id="full-name" name="full-name" required>
+                </div>
+                <div>
+                    <label for="signup-email">Email:</label>
+                    <input type="email" id="signup-email" name="email" required>
+                </div>
+                <div>
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <button type="submit">Create Account</button>
+                <p class="form-switch">Already have an account? <a href="#" id="switch-to-signin">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <section class="hero-section">
+        <h1>Welcome to the Modded Motor Market</h1>
+        <p>Your ultimate destination for buying, selling, and exploring modded German cars.</p>
+        <a href="listings.html" class="cta-button">Explore Listings</a>
+        <a href="sellyourcar.html" class="cta-button">Sell Your Car</a>
+    </section>
+
+    <section class="about-section">
+        <h2>About Us</h2>
+        <p>
+            At <strong>Modded Motor Market</strong>, we are passionate about German cars and the culture of customization.
+            Our platform is designed to connect <strong>sellers</strong>, <strong>enthusiasts</strong>, and <strong>buyers</strong>
+            who share a love for modded German vehicles.
+        </p>
+        <p>
+            Whether you're looking to buy a uniquely modified BMW, sell your tuned Mercedes-Benz,
+            or simply connect with like-minded enthusiasts, you've come to the right place.
+        </p>
+    </section>
+
+    <section class="mission-section">
+        <h2>Our Mission</h2>
+        <p>
+            Our mission is to create a <strong>dedicated marketplace</strong> for modded German cars,
+            where enthusiasts can find high-quality, customized vehicles and sellers can reach
+            a targeted audience of passionate buyers.
+        </p>
+        <p>
+            We aim to provide a seamless experience for everyone, from first-time buyers
+            to seasoned collectors.
+        </p>
+    </section>
+
+    <section class="why-choose-us-section">
+        <h2>Why Choose Modded Motor Market?</h2>
+        <ul>
+            <li><strong>Curated Listings:</strong> Only the best modded German cars.</li>
+            <li><strong>Targeted Audience:</strong> Connect with enthusiasts who appreciate your work.</li>
+            <li><strong>Community-Driven:</strong> Join a community of like-minded car lovers.</li>
+            <li><strong>Transparent Transactions:</strong> Safe and secure buying/selling process.</li>
+            <li><strong>Expert Support:</strong> Our team understands modded cars and can help with valuation.</li>
+            <li><strong>Quality Assurance:</strong> All listings go through a verification process.</li>
+        </ul>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to Join the Community?</h2>
+        <p>
+            Whether you're here to buy, sell, or simply explore, we welcome you to
+            <strong>Modded Motor Market</strong>. Start your journey today!
+        </p>
+        <a href="sellyourcar.html" class="cta-button">Sell Your Car</a>
+        <a href="listings.html" class="cta-button">Browse Listings</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Modded Motor Market. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize auth system
+            initAuthSystem();
+
+            // Initialize mobile menu
+            initMobileMenu();
+
+            // Debug check
+            console.log('Page initialized');
+        });
+
+        function initMobileMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const accountDropdown = document.getElementById('accountDropdown');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Dropdown toggle for mobile
+            if (accountDropdown) {
+                const accountLink = document.getElementById('account-link');
+
+                accountLink.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 992) {
+                        e.preventDefault();
+                        accountDropdown.classList.toggle('active');
+                    }
+                });
+            }
+        }
+
+        function initAuthSystem() {
+            // Get elements
+            const authButton = document.getElementById('auth-button');
+            const authModal = document.getElementById('auth-modal');
+            const closeButton = document.querySelector('.close');
+            const switchToSignup = document.getElementById('switch-to-signup');
+            const switchToSignin = document.getElementById('switch-to-signin');
+            const signinForm = document.getElementById('signin-form');
+            const signupForm = document.getElementById('signup-form');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Toggle modal function
+            function toggleModal(show) {
+                authModal.style.display = show ? 'block' : 'none';
+                document.body.style.overflow = show ? 'hidden' : 'auto';
+            }
+
+            // Auth button click
+            if (authButton) {
+                authButton.addEventListener('click', function() {
+                    toggleModal(true);
+                    // Show sign-in form by default
+                    if (signinForm) signinForm.style.display = 'block';
+                    if (signupForm) signupForm.style.display = 'none';
+                });
+            }
+
+            // Close button click
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    toggleModal(false);
+                });
+            }
+
+            // Close when clicking outside modal
+            authModal.addEventListener('click', function(e) {
+                if (e.target === authModal) {
+                    toggleModal(false);
+                }
+            });
+
+            // Switch between forms
+            if (switchToSignup && signinForm && signupForm) {
+                switchToSignup.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    signinForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                });
+            }
+
+            if (switchToSignin && signinForm && signupForm) {
+                switchToSignin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    signupForm.style.display = 'none';
+                    signinForm.style.display = 'block';
+                });
+            }
+
+            // Form submissions
+            if (signinForm) {
+                signinForm.addEventListener('submit', handleSignIn);
+            }
+
+            if (signupForm) {
+                signupForm.addEventListener('submit', handleSignUp);
+            }
+
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('currentUser');
+                    updateAuthUI(false);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Check auth status on load
+            checkAuthStatus();
+        }
+
+        function handleSignIn(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                updateAuthUI(true);
+                document.getElementById('auth-modal').style.display = 'none';
+                alert('Sign in successful!');
+            } else {
+                alert('Invalid email or password.');
+            }
+        }
+
+        function handleSignUp(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const fullName = document.getElementById('full-name').value;
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            if (users.some(u => u.email === email)) {
+                alert('Email already exists.');
+                return;
+            }
+
+            const newUser = { email, password, fullName };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            updateAuthUI(true);
+            document.getElementById('auth-modal').style.display = 'none';
+            alert('Account created successfully!');
+        }
+
+        function handleGoogleSignIn(response) {
+            // This is where you handle the Google Sign-In response
+            const user = {
+                fullName: response.credential.name,
+                email: response.credential.email,
+                isGoogleSignIn: true,
+                googleId: response.credential.sub,
+                profilePicture: response.credential.picture
+            };
+            
+            // Save user to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Update UI and close modal
+            updateAuthUI(true);
+            document.getElementById('auth-modal').style.display = 'none';
+            
+            // Optional: Welcome message
+            alert(`Welcome ${user.fullName}! You've signed in with Google.`);
+            
+            // For production, you should send the credential to your backend for verification
+            // verifyGoogleToken(response.credential);
+        }
+
+        function checkAuthStatus() {
+            try {
+                const user = localStorage.getItem('currentUser');
+                updateAuthUI(!!user);
+            } catch (e) {
+                updateAuthUI(false);
+            }
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            const authButton = document.getElementById('auth-button');
+            const accountLink = document.getElementById('account-link');
+            const userAvatar = document.getElementById('userAvatar');
+            const accountText = document.getElementById('accountText');
+
+            if (authButton) authButton.style.display = isLoggedIn ? 'none' : 'flex';
+            if (accountLink) {
+                accountLink.style.display = isLoggedIn ? 'flex' : 'none';
+                if (isLoggedIn) {
+                    try {
+                        const user = JSON.parse(localStorage.getItem('currentUser'));
+                        if (user) {
+                            // Set initials for avatar or use Google profile picture
+                            if (user.isGoogleSignIn && user.profilePicture) {
+                                userAvatar.innerHTML = `<img src="${user.profilePicture}" alt="Profile" style="border-radius: 50%; width: 32px; height: 32px;">`;
+                            } else {
+                                const initials = user.fullName ? 
+                                    user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
+                                userAvatar.textContent = initials;
+                            }
+
+                            // Set account name
+                            accountText.textContent = user.fullName || 'My Account';
+                        }
+                    } catch (e) {
+                        userAvatar.textContent = 'JD';
+                        accountText.textContent = 'My Account';
+                    }
+                }
+            }
+        }
+
+        // Optional: Function to verify Google token on your backend
+        async function verifyGoogleToken(credential) {
+            try {
+                const response = await fetch('/api/verify-google-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ credential })
+                });
+                
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Verification failed');
+                
+                // Handle successful verification
+                console.log('Google token verified', data);
+            } catch (error) {
+                console.error('Error verifying Google token:', error);
+                // Handle error (e.g., show error message to user)
+            }
+        }
+    </script>
+</body>
+</html>

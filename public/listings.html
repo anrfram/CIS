@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Used Cars - Modded Motor Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <img src="MMM.jpg" alt="Modded Motor Market Logo">
+            <div class="logo"></div>
+        </div>
+
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="listings.html"><i class="fas fa-car"></i> Listings</a></li>
+            <li><a href="sellyourcar.html"><i class="fas fa-tag"></i> Sell Your Car</a></li>
+
+            <li class="dropdown" id="accountDropdown">
+                <a href="#" id="account-link" style="display: none;">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span id="accountText"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="account.html"><i class="fas fa-user-circle"></i> My Profile</a>
+                     <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
+                    <a href="saved-cars.html"><i class="fas fa-heart"></i> Saved Cars</a>
+                    <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+
+            <li>
+                <button id="auth-button">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <!-- Sign In Form -->
+            <form id="signin-form">
+                <h2>Sign In</h2>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Sign In</button>
+                <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
+            </form>
+
+            <!-- Sign Up Form (hidden by default) -->
+            <form id="signup-form" style="display: none;">
+                <h2>Create Account</h2>
+                <div>
+                    <label for="full-name">Full Name:</label>
+                    <input type="text" id="full-name" name="full-name" required>
+                </div>
+                <div>
+                    <label for="signup-email">Email:</label>
+                    <input type="email" id="signup-email" name="email" required>
+                </div>
+                <div>
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <button type="submit">Create Account</button>
+                <p class="form-switch">Already have an account? <a href="#" id="switch-to-signin">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Listing Details Modal -->
+    <div id="details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-details-modal">&times;</span>
+            <h2>Listing Details</h2>
+            <div id="listing-details-content">
+                <!-- Details content will be inserted here -->
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <button id="close-details-btn" style="background: #666;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <section class="used-cars">
+        <h1>Used Cars</h1>
+
+        <!-- Filter Section (moved above listings) -->
+        <div class="filter-section">
+            <form id="filter-form">
+                <!-- Make Dropdown -->
+                <label for="make">Make:</label>
+                <select id="make" name="make">
+                    <option value="">Select Make</option>
+                </select>
+
+                <!-- Model Dropdown -->
+                <label for="model">Model:</label>
+                <select id="model" name="model">
+                    <option value="">Select Model</option>
+                </select>
+
+                <!-- Year Filter - Changed to dropdown -->
+                <label for="year">Year:</label>
+                <select id="year" name="year">
+                    <option value="">Select Year</option>
+                </select>
+
+                <!-- Price Range Filter -->
+                <label for="min-price">Min Price:</label>
+                <input type="number" id="min-price" name="min-price" placeholder="Min Price">
+                <label for="max-price">Max Price:</label>
+                <input type="number" id="max-price" name="max-price" placeholder="Max Price">
+
+                <div class="filter-buttons">
+                    <button type="submit">Apply Filters</button>
+                    <button type="button" id="clear-filters" class="clear-filters">Clear Filters</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Car Listings Grid -->
+        <div class="car-grid" id="car-listings">
+            <!-- Used car listings will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Modded Motor Market. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize auth system
+            initAuthSystem();
+
+            // Initialize mobile menu
+            initMobileMenu();
+
+            // Initialize make/model/year dropdowns
+            initMakeModelDropdowns();
+            initYearDropdown();
+
+            // Initialize saved listings data structure
+            initializeSavedListings();
+
+            // Load car listings
+            loadCarListings();
+
+            // Apply filters
+            applyFilters();
+
+            // Add clear filters functionality
+            document.getElementById('clear-filters').addEventListener('click', function() {
+                document.getElementById('filter-form').reset();
+                loadCarListings();
+            });
+        });
+
+        function initializeSavedListings() {
+            if (!localStorage.getItem('savedListings')) {
+                localStorage.setItem('savedListings', JSON.stringify([]));
+            }
+        }
+
+        function initYearDropdown() {
+            const yearDropdown = document.getElementById('year');
+            const currentYear = new Date().getFullYear();
+
+            // Add years from current year down to 1990
+            for (let year = currentYear; year >= 1990; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearDropdown.appendChild(option);
+            }
+        }
+
+        function initMobileMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const accountDropdown = document.getElementById('accountDropdown');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Dropdown toggle for mobile
+            if (accountDropdown) {
+                const accountLink = document.getElementById('account-link');
+
+                accountLink.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 992) {
+                        e.preventDefault();
+                        accountDropdown.classList.toggle('active');
+                    }
+                });
+            }
+        }
+
+        function initAuthSystem() {
+            // Get elements
+            const authButton = document.getElementById('auth-button');
+            const authModal = document.getElementById('auth-modal');
+            const closeButton = document.querySelector('.close');
+            const switchToSignup = document.getElementById('switch-to-signup');
+            const switchToSignin = document.getElementById('switch-to-signin');
+            const signinForm = document.getElementById('signin-form');
+            const signupForm = document.getElementById('signup-form');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Toggle modal function
+            function toggleModal(show) {
+                authModal.style.display = show ? 'block' : 'none';
+                document.body.style.overflow = show ? 'hidden' : 'auto';
+            }
+
+            // Auth button click
+            if (authButton) {
+                authButton.addEventListener('click', function() {
+                    toggleModal(true);
+                    // Show sign-in form by default
+                    if (signinForm) signinForm.style.display = 'block';
+                    if (signupForm) signupForm.style.display = 'none';
+                });
+            }
+
+            // Close button click
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    toggleModal(false);
+                });
+            }
+
+            // Close when clicking outside modal
+            authModal.addEventListener('click', function(e) {
+                if (e.target === authModal) {
+                    toggleModal(false);
+                }
+            });
+
+            // Switch between forms
+            if (switchToSignup && signinForm && signupForm) {
+                switchToSignup.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    signinForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                });
+            }
+
+            if (switchToSignin && signinForm && signupForm) {
+                switchToSignin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    signupForm.style.display = 'none';
+                    signinForm.style.display = 'block';
+                });
+            }
+
+            // Form submissions
+            if (signinForm) {
+                signinForm.addEventListener('submit', handleSignIn);
+            }
+
+            if (signupForm) {
+                signupForm.addEventListener('submit', handleSignUp);
+            }
+
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('currentUser');
+                    updateAuthUI(false);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Check auth status on load
+            checkAuthStatus();
+        }
+
+        function handleSignIn(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                updateAuthUI(true);
+                document.getElementById('auth-modal').style.display = 'none';
+                alert('Sign in successful!');
+                // Reload to update saved listings
+                window.location.reload();
+            } else {
+                alert('Invalid email or password.');
+            }
+        }
+
+        function handleSignUp(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const fullName = document.getElementById('full-name').value;
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            if (users.some(u => u.email === email)) {
+                alert('Email already exists.');
+                return;
+            }
+
+            const newUser = { email, password, fullName, createdAt: new Date().toISOString() };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            updateAuthUI(true);
+            document.getElementById('auth-modal').style.display = 'none';
+            alert('Account created successfully!');
+            // Reload to update saved listings
+            window.location.reload();
+        }
+
+        function checkAuthStatus() {
+            try {
+                const user = localStorage.getItem('currentUser');
+                updateAuthUI(!!user);
+            } catch (e) {
+                updateAuthUI(false);
+            }
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            const authButton = document.getElementById('auth-button');
+            const accountLink = document.getElementById('account-link');
+            const userAvatar = document.getElementById('userAvatar');
+            const accountText = document.getElementById('accountText');
+
+            if (authButton) authButton.style.display = isLoggedIn ? 'none' : 'flex';
+            if (accountLink) {
+                accountLink.style.display = isLoggedIn ? 'flex' : 'none';
+                if (isLoggedIn) {
+                    try {
+                        const user = JSON.parse(localStorage.getItem('currentUser'));
+                        if (user) {
+                            // Set initials for avatar
+                            const initials = user.fullName ? 
+                                user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
+                            userAvatar.textContent = initials;
+
+                            // Set account name
+                            accountText.textContent = user.fullName || 'My Account';
+                        }
+                    } catch (e) {
+                        userAvatar.textContent = 'JD';
+                        accountText.textContent = 'My Account';
+                    }
+                }
+            }
+        }
+
+        // Car brands and models API fetch code
+        function initMakeModelDropdowns() {
+            const makeDropdown = document.getElementById("make");
+            const modelDropdown = document.getElementById("model");
+
+            // Fetch car brands (makes) from the API
+            fetch("/api/car-brands")
+                .then(response => response.json())
+                .then(brands => {
+                    brands.forEach(brand => {
+                        const option = document.createElement("option");
+                        option.value = brand.name;
+                        option.textContent = brand.name;
+                        makeDropdown.appendChild(option);
+                    });
+                });
+
+            // Fetch models when a brand is selected
+            makeDropdown.addEventListener("change", function () {
+                modelDropdown.innerHTML = '<option value="">Select Model</option>'; // Reset models dropdown
+
+                const selectedBrand = makeDropdown.value;
+                if (!selectedBrand) return;
+
+                fetch(`/api/car-models?brand=${selectedBrand}`)
+                    .then(response => response.json())
+                    .then(models => {
+                        models.forEach(model => {
+                            const option = document.createElement("option");
+                            option.value = model.name;
+                            option.textContent = model.name;
+                            modelDropdown.appendChild(option);
+                        });
+                    });
+            });
+        }
+
+        // Function to load and display car listings
+        function loadCarListings() {
+            const carListingsContainer = document.getElementById('car-listings');
+            const allListings = JSON.parse(localStorage.getItem('listings')) || [];
+
+            // Filter out sold listings and only show active or pending listings
+            const listings = allListings.filter(listing => 
+                !listing.isSold && listing.status !== 'sold'
+            );
+
+            // Check for new listing flag in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const newListing = urlParams.get('newListing');
+
+            if (newListing === 'true') {
+                // Scroll to top and show success message
+                window.scrollTo(0, 0);
+                alert('Your car has been successfully listed!');
+                // Remove the flag from URL
+                history.replaceState(null, '', window.location.pathname);
+            }
+
+            // Clear existing listings
+            carListingsContainer.innerHTML = '';
+
+            if (listings.length === 0) {
+                carListingsContainer.innerHTML = '<p>No cars found. Be the first to list your car!</p>';
+                return;
+            }
+
+            // Create HTML for each listing
+            listings.forEach(listing => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card';
+
+                // Add pending badge if listing is pending
+                const pendingBadge = listing.status === 'pending' ? 
+                    '<span class="status-badge status-pending">Pending</span>' : '';
+
+                carCard.innerHTML = `
+                    <div class="car-image-container">
+                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}" class="car-image">
+                        <button class="save-listing-btn" data-id="${listing.id}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="car-info">
+                        <h3 class="car-title">${listing.year} ${listing.make} ${listing.model} ${pendingBadge}</h3>
+                        <p class="car-price">$${listing.price.toLocaleString()}</p>
+                        <div class="car-details">
+                            <span><i class="fas fa-tachometer-alt"></i> ${listing.mileage.toLocaleString()} mi</span>
+                            <span><i class="fas fa-wrench"></i> ${getModsText(listing.modifications)}</span>
+                        </div>
+                        <button class="view-details" data-id="${listing.id}">View Details</button>
+                    </div>
+                `;
+
+                carListingsContainer.appendChild(carCard);
+            });
+
+            // Add event listeners to view details buttons
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const listingId = this.getAttribute('data-id');
+                    viewListingDetails(listingId);
+                });
+            });
+
+            // Setup save listing buttons
+            setupSaveListingButtons();
+        }
+
+        function setupSaveListingButtons() {
+            document.querySelectorAll('.save-listing-btn').forEach(btn => {
+                const listingId = btn.getAttribute('data-id');
+                const savedListings = JSON.parse(localStorage.getItem('savedListings')) || [];
+                const isSaved = savedListings.some(listing => listing.id === listingId);
+
+                if (isSaved) {
+                    btn.classList.add('saved');
+                    btn.innerHTML = '<i class="fas fa-heart"></i>';
+                }
+
+                btn.addEventListener('click', function() {
+                    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    if (!currentUser) {
+                        alert('Please sign in to save listings');
+                        document.getElementById('auth-button').click();
+                        return;
+                    }
+
+                    toggleSavedListing(listingId, this);
+                });
+            });
+        }
+
+        function toggleSavedListing(listingId, button) {
+            const listings = JSON.parse(localStorage.getItem('listings')) || [];
+            const listing = listings.find(l => l.id === listingId);
+            let savedListings = JSON.parse(localStorage.getItem('savedListings')) || [];
+
+            if (!listing) return;
+
+            const isSaved = savedListings.some(l => l.id === listingId);
+
+            if (isSaved) {
+                // Remove from saved
+                savedListings = savedListings.filter(l => l.id !== listingId);
+                button.classList.remove('saved');
+                button.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+                // Add to saved
+                savedListings.push(listing);
+                button.classList.add('saved');
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+            }
+
+            localStorage.setItem('savedListings', JSON.stringify(savedListings));
+
+            // Update saved count in account if on that page
+            if (document.getElementById('saved-count')) {
+                document.getElementById('saved-count').textContent = savedListings.length;
+            }
+        }
+
+        // Helper function for modifications text
+        function getModsText(mods) {
+            const modsText = {
+                'none': 'Stock',
+                'performance': 'Performance',
+                'cosmetic': 'Cosmetic',
+                'both': 'Performance + Cosmetic'
+            };
+            return modsText[mods] || mods;
+        }
+
+        // Function to view listing details with swipeable gallery
+        function viewListingDetails(listingId) {
+            const listings = JSON.parse(localStorage.getItem('listings')) || [];
+            const listing = listings.find(l => l.id === listingId);
+
+            if (!listing) {
+                alert('Listing not found');
+                return;
+            }
+
+            // Current image index for the gallery
+            let currentImageIndex = 0;
+            const totalImages = listing.photos.length;
+
+            // Format the details HTML with swipeable gallery
+            const detailsHTML = `
+                <div class="listing-details">
+                    <div class="listing-image-container">
+                        <img src="${listing.photos[0]}" alt="${listing.year} ${listing.make} ${listing.model}">
+                        ${totalImages > 1 ? `
+                            <button class="gallery-nav prev"><i class="fas fa-chevron-left"></i></button>
+                            <button class="gallery-nav next"><i class="fas fa-chevron-right"></i></button>
+                            <div class="gallery-counter">1 of ${totalImages}</div>
+                        ` : ''}
+                    </div>
+                    ${totalImages > 1 ? `
+                        <div class="thumbnail-container">
+                            ${listing.photos.map((photo, index) => `
+                                <img src="${photo}" class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="listing-info">
+                        <h3>${listing.year} ${listing.make} ${listing.model}</h3>
+                        <p class="price">$${listing.price.toLocaleString()}</p>
+                        <div class="car-details">
+                            <span><i class="fas fa-tachometer-alt"></i> ${listing.mileage.toLocaleString()} mi</span>
+                            <span><i class="fas fa-wrench"></i> ${getModsText(listing.modifications)}</span>
+                            <span><i class="fas fa-car"></i> ${listing.condition}</span>
+                        </div>
+                        <div class="description">
+                            <h4>Description:</h4>
+                            <p>${listing.description}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Insert into modal
+            document.getElementById('listing-details-content').innerHTML = detailsHTML;
+
+            // Show the modal
+            document.getElementById('details-modal').style.display = 'block';
+
+            // Initialize gallery navigation if there are multiple images
+            if (totalImages > 1) {
+                const imageContainer = document.querySelector('.listing-image-container');
+                const mainImage = imageContainer.querySelector('img');
+                const prevButton = document.querySelector('.gallery-nav.prev');
+                const nextButton = document.querySelector('.gallery-nav.next');
+                const thumbnails = document.querySelectorAll('.thumbnail');
+                const counter = document.querySelector('.gallery-counter');
+
+                // Function to update the displayed image
+                function updateImage(index) {
+                    currentImageIndex = index;
+                    mainImage.src = listing.photos[index];
+                    counter.textContent = `${index + 1} of ${totalImages}`;
+
+                    // Update active thumbnail
+                    thumbnails.forEach((thumb, i) => {
+                        thumb.classList.toggle('active', i === index);
+                    });
+                }
+
+                // Previous button click
+                prevButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const newIndex = (currentImageIndex - 1 + totalImages) % totalImages;
+                    updateImage(newIndex);
+                });
+
+                // Next button click
+                nextButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const newIndex = (currentImageIndex + 1) % totalImages;
+                    updateImage(newIndex);
+                });
+
+                // Thumbnail click
+                thumbnails.forEach(thumb => {
+                    thumb.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        updateImage(index);
+                    });
+                });
+
+                // Touch events for swiping
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                imageContainer.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, false);
+
+                imageContainer.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, false);
+
+                function handleSwipe() {
+                    const threshold = 50; // Minimum swipe distance
+                    const diff = touchStartX - touchEndX;
+
+                    if (diff > threshold) {
+                        // Swipe left - next image
+                        const newIndex = (currentImageIndex + 1) % totalImages;
+                        updateImage(newIndex);
+                    } else if (diff < -threshold) {
+                        // Swipe right - previous image
+                        const newIndex = (currentImageIndex - 1 + totalImages) % totalImages;
+                        updateImage(newIndex);
+                    }
+                }
+            }
+
+            // Add event listeners for closing the modal
+            document.querySelector('.close-details-modal').addEventListener('click', () => {
+                document.getElementById('details-modal').style.display = 'none';
+            });
+
+            document.getElementById('close-details-btn').addEventListener('click', () => {
+                document.getElementById('details-modal').style.display = 'none';
+            });
+
+            // Close when clicking outside the modal
+            window.addEventListener('click', (event) => {
+                if (event.target === document.getElementById('details-modal')) {
+                    document.getElementById('details-modal').style.display = 'none';
+                }
+            });
+        }
+
+        // Function to apply filters
+        function applyFilters() {
+            const form = document.getElementById('filter-form');
+            const allListings = JSON.parse(localStorage.getItem('listings')) || [];
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const make = document.getElementById('make').value;
+                const model = document.getElementById('model').value;
+                const year = document.getElementById('year').value;
+                const minPrice = document.getElementById('min-price').value;
+                const maxPrice = document.getElementById('max-price').value;
+
+                const filteredListings = allListings.filter(listing => {
+                    // Apply each filter if it has a value
+                    if (make && listing.make !== make) return false;
+                    if (model && listing.model !== model) return false;
+                    if (year && listing.year.toString() !== year) return false;
+                    if (minPrice && listing.price < parseFloat(minPrice)) return false;
+                    if (maxPrice && listing.price > parseFloat(maxPrice)) return false;
+                    return true;
+                });
+
+                displayFilteredListings(filteredListings);
+            });
+        }
+
+        // Function to display filtered listings
+        function displayFilteredListings(filteredListings) {
+            const carListingsContainer = document.getElementById('car-listings');
+            carListingsContainer.innerHTML = '';
+
+            // Filter out sold listings from the filtered results
+            const activeListings = filteredListings.filter(listing => 
+                !listing.isSold && listing.status !== 'sold'
+            );
+
+            if (activeListings.length === 0) {
+                carListingsContainer.innerHTML = '<p>No cars match your filters.</p>';
+                return;
+            }
+
+            activeListings.forEach(listing => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card';
+
+                // Add pending badge if listing is pending
+                const pendingBadge = listing.status === 'pending' ? 
+                    '<span class="status-badge status-pending">Pending</span>' : '';
+
+                carCard.innerHTML = `
+                    <div class="car-image-container">
+                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}" class="car-image">
+                        <button class="save-listing-btn" data-id="${listing.id}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="car-info">
+                        <h3 class="car-title">${listing.year} ${listing.make} ${listing.model} ${pendingBadge}</h3>
+                        <p class="car-price">$${listing.price.toLocaleString()}</p>
+                        <div class="car-details">
+                            <span><i class="fas fa-tachometer-alt"></i> ${listing.mileage.toLocaleString()} mi</span>
+                            <span><i class="fas fa-wrench"></i> ${getModsText(listing.modifications)}</span>
+                        </div>
+                        <button class="view-details" data-id="${listing.id}">View Details</button>
+                    </div>
+                `;
+
+                carListingsContainer.appendChild(carCard);
+            });
+
+            // Reattach event listeners
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const listingId = this.getAttribute('data-id');
+                    viewListingDetails(listingId);
+                });
+            });
+
+            // Setup save listing buttons
+            setupSaveListingButtons();
+        }
+    </script>
+</body>
+</html>

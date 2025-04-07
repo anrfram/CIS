@@ -6,12 +6,134 @@
     <title>Used Cars - Modded Motor Market</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* Vertical grid layout - thumbnails flow downward */
+        .thumbnail-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns max */
+            gap: 10px;
+            max-height: 300px; /* Fixed height with vertical scroll */
+            overflow-y: auto; /* Vertical scroll if needed */
+            padding: 5px;
+            margin-top: 15px;
+        }
 
+        .thumbnail {
+            width: 100%;
+            height: 80px; /* Fixed height makes them more vertical */
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        /* Active thumbnail highlight */
+        .thumbnail.active {
+            border-color: #007bff;
+            transform: scale(0.95);
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .thumbnail {
+                height: 100px; /* Taller thumbnails on desktop */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .thumbnail-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+            }
+        }
+
+        /* This will give you a nice in-between width */
+        #details-modal .modal-content {
+            width: 85%; /* Between the standard 80% and your 90% */
+            max-width: 1000px; /* Perfect middle ground between 800px and 1200px */
+            margin: 3% auto;
+            padding: 25px;
+        }
+
+        /* Layout for the content */
+        .listing-details {
+            display: grid;
+            grid-template-columns: 55% 45%; /* Slightly more space for images */
+            gap: 25px;
+        }
+
+        /* Mobile layout */
+        @media (max-width: 768px) {
+            #details-modal .modal-content {
+                width: 95%;
+                max-width: 95%;
+            }
+
+            .listing-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Social Login Styles */
+        .social-login {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .g_id_signin {
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        /* Modal adjustments for Google button */
+        .modal-content {
+            width: 350px;
+            max-width: 90%;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider-text {
+            padding: 0 10px;
+            color: #777;
+        }
+
+        /* User avatar styles */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4a6fa5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body>
     <nav>
         <div class="nav-brand">
-            <img src="MMM.jpg" alt="Modded Motor Market Logo">
             <div class="logo"></div>
         </div>
 
@@ -32,7 +154,7 @@
                 </a>
                 <div class="dropdown-content">
                     <a href="account.html"><i class="fas fa-user-circle"></i> My Profile</a>
-                     <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
+                    <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
                     <a href="saved-cars.html"><i class="fas fa-heart"></i> Saved Cars</a>
                     <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
@@ -64,6 +186,29 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit">Sign In</button>
+
+                <div class="divider">
+                    <span class="divider-text">or</span>
+                </div>
+
+                <div class="social-login">
+                    <div id="g_id_onload"
+                         data-client_id="685654434134-h0nmsv0e4p0q6pcdgtspnbq7uhlj09qj.apps.googleusercontent.com"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
+
                 <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
             </form>
 
@@ -293,7 +438,7 @@
                     e.preventDefault();
                     localStorage.removeItem('currentUser');
                     updateAuthUI(false);
-                    window.location.href = 'index.html';
+                    window.location.reload();
                 });
             }
 
@@ -336,7 +481,13 @@
                 return;
             }
 
-            const newUser = { email, password, fullName, createdAt: new Date().toISOString() };
+            const newUser = { 
+                email, 
+                password, 
+                fullName, 
+                createdAt: new Date().toISOString(),
+                isGoogleSignIn: false
+            };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -348,10 +499,89 @@
             window.location.reload();
         }
 
+        function handleGoogleSignIn(response) {
+            try {
+                if (!response.credential) {
+                    console.error('No credential in Google response');
+                    alert('Google sign-in failed. Please try again.');
+                    return;
+                }
+
+                // Decode the JWT to get user info
+                const decodeJwt = (token) => {
+                    try {
+                        const base64Url = token.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(
+                            atob(base64)
+                                .split('')
+                                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                                .join('')
+                        );
+                        return JSON.parse(jsonPayload);
+                    } catch (e) {
+                        console.error('Error decoding JWT:', e);
+                        return null;
+                    }
+                };
+
+                const decodedToken = decodeJwt(response.credential);
+
+                if (!decodedToken) {
+                    alert('Failed to process Google sign-in. Please try again.');
+                    return;
+                }
+
+                const googleEmail = decodedToken.email;
+
+                if (!googleEmail) {
+                    alert('Could not retrieve email from Google. Please try another method.');
+                    return;
+                }
+
+                // Check if user exists in our database
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                const existingUser = users.find(u => u.email === googleEmail);
+
+                if (!existingUser) {
+                    // User doesn't exist - show error and prompt to create account
+                    alert('No account found with this Google email. Please create an account first.');
+                    document.getElementById('auth-modal').style.display = 'block';
+                    document.getElementById('signin-form').style.display = 'none';
+                    document.getElementById('signup-form').style.display = 'block';
+                    document.getElementById('signup-email').value = googleEmail;
+                    document.getElementById('full-name').value = decodedToken.name || '';
+                    return;
+                }
+
+                // User exists - log them in
+                const userToLogin = {
+                    ...existingUser,
+                    isGoogleSignIn: true,
+                    profilePicture: decodedToken.picture || ''
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(userToLogin));
+                updateAuthUI(true);
+                document.getElementById('auth-modal').style.display = 'none';
+
+                // Welcome message
+                const welcomeName = existingUser.fullName || 'User';
+                alert(`Welcome back ${welcomeName}! You're now signed in.`);
+                window.location.reload();
+            } catch (error) {
+                console.error('Error in Google sign-in:', error);
+                alert('An error occurred during Google sign-in. Please try again.');
+            }
+        }
+
         function checkAuthStatus() {
             try {
                 const user = localStorage.getItem('currentUser');
                 updateAuthUI(!!user);
+                if (!user) {
+                    loadCarListings(); // Added to refresh hearts when logged out
+                }
             } catch (e) {
                 updateAuthUI(false);
             }
@@ -370,10 +600,15 @@
                     try {
                         const user = JSON.parse(localStorage.getItem('currentUser'));
                         if (user) {
-                            // Set initials for avatar
-                            const initials = user.fullName ? 
-                                user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
-                            userAvatar.textContent = initials;
+                            // Set avatar - use Google picture if available, otherwise initials
+                            if (user.isGoogleSignIn && user.profilePicture) {
+                                userAvatar.innerHTML = `<img src="${user.profilePicture}" alt="Profile">`;
+                            } else {
+                                const initials = user.fullName ? 
+                                    user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                                    'JD';
+                                userAvatar.textContent = initials;
+                            }
 
                             // Set account name
                             accountText.textContent = user.fullName || 'My Account';
@@ -386,7 +621,9 @@
             }
         }
 
-        // Car brands and models API fetch code
+        // Make handleGoogleSignIn available globally
+        window.handleGoogleSignIn = handleGoogleSignIn;
+
         function initMakeModelDropdowns() {
             const makeDropdown = document.getElementById("make");
             const modelDropdown = document.getElementById("model");
@@ -423,7 +660,6 @@
             });
         }
 
-        // Function to load and display car listings
         function loadCarListings() {
             const carListingsContainer = document.getElementById('car-listings');
             const allListings = JSON.parse(localStorage.getItem('listings')) || [];
@@ -464,7 +700,7 @@
 
                 carCard.innerHTML = `
                     <div class="car-image-container">
-                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}" class="car-image">
+                        <img src="${listing.photos[listing.coverPhotoIndex || 0]}" alt="${listing.make} ${listing.model}" class="car-image">
                         <button class="save-listing-btn" data-id="${listing.id}">
                             <i class="far fa-heart"></i>
                         </button>
@@ -499,11 +735,16 @@
             document.querySelectorAll('.save-listing-btn').forEach(btn => {
                 const listingId = btn.getAttribute('data-id');
                 const savedListings = JSON.parse(localStorage.getItem('savedListings')) || [];
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 const isSaved = savedListings.some(listing => listing.id === listingId);
 
-                if (isSaved) {
+                // Only show as hearted if user is logged in AND listing is saved
+                if (isSaved && currentUser) {
                     btn.classList.add('saved');
                     btn.innerHTML = '<i class="fas fa-heart"></i>';
+                } else {
+                    btn.classList.remove('saved');
+                    btn.innerHTML = '<i class="far fa-heart"></i>';
                 }
 
                 btn.addEventListener('click', function() {
@@ -570,24 +811,24 @@
             }
 
             // Current image index for the gallery
-            let currentImageIndex = 0;
+            let currentImageIndex = listing.coverPhotoIndex || 0;
             const totalImages = listing.photos.length;
 
             // Format the details HTML with swipeable gallery
             const detailsHTML = `
                 <div class="listing-details">
                     <div class="listing-image-container">
-                        <img src="${listing.photos[0]}" alt="${listing.year} ${listing.make} ${listing.model}">
+                        <img src="${listing.photos[currentImageIndex]}" alt="${listing.year} ${listing.make} ${listing.model}">
                         ${totalImages > 1 ? `
                             <button class="gallery-nav prev"><i class="fas fa-chevron-left"></i></button>
                             <button class="gallery-nav next"><i class="fas fa-chevron-right"></i></button>
-                            <div class="gallery-counter">1 of ${totalImages}</div>
+                            <div class="gallery-counter">${currentImageIndex + 1} of ${totalImages}</div>
                         ` : ''}
                     </div>
                     ${totalImages > 1 ? `
                         <div class="thumbnail-container">
                             ${listing.photos.map((photo, index) => `
-                                <img src="${photo}" class="thumbnail ${index === 0 ? 'active' : ''}" data-index="${index}">
+                                <img src="${photo}" class="thumbnail ${index === currentImageIndex ? 'active' : ''}" data-index="${index}">
                             `).join('')}
                         </div>
                     ` : ''}
@@ -757,7 +998,7 @@
 
                 carCard.innerHTML = `
                     <div class="car-image-container">
-                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}" class="car-image">
+                        <img src="${listing.photos[listing.coverPhotoIndex || 0]}" alt="${listing.make} ${listing.model}" class="car-image">
                         <button class="save-listing-btn" data-id="${listing.id}">
                             <i class="far fa-heart"></i>
                         </button>

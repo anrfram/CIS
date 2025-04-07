@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,6 @@
     <title>Modded Motor Market</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <!-- Add Google Identity Services script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         /* Social Login Styles */
@@ -42,12 +41,34 @@
             padding: 0 10px;
             color: #777;
         }
+
+        /* User avatar styles */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4a6fa5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
     <nav>
         <div class="nav-brand">
-            <img src="MMM.jpg" alt="Modded Motor Market Logo">
+           
             <div class="logo"></div>
         </div>
 
@@ -59,7 +80,7 @@
             <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="listings.html"><i class="fas fa-car"></i> Listings</a></li>
             <li><a href="sellyourcar.html"><i class="fas fa-tag"></i> Sell Your Car</a></li>
-           
+
             <li class="dropdown" id="accountDropdown">
                 <a href="#" id="account-link" style="display: none;">
                     <div class="user-avatar" id="userAvatar"></div>
@@ -68,8 +89,8 @@
                 </a>
                 <div class="dropdown-content">
                     <a href="account.html"><i class="fas fa-user-circle"></i> My Profile</a>
-                     <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
-                    <a href="saved-cars.html"><i class="fas fa-heart"></i> Saved Cars</a>
+                    <a href="account.html?section=saved" data-section="saved"><i class="fas fa-heart"></i> Saved Listings</a>
+                    <a href="account.html?section=my-listings" data-section="my-listings"><i class="fas fa-list"></i> My Listings</a>
                     <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </li>
@@ -100,11 +121,11 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit">Sign In</button>
-                
+
                 <div class="divider">
                     <span class="divider-text">or</span>
                 </div>
-                
+
                 <div class="social-login">
                     <div id="g_id_onload"
                          data-client_id="685654434134-h0nmsv0e4p0q6pcdgtspnbq7uhlj09qj.apps.googleusercontent.com"
@@ -122,7 +143,7 @@
                          data-logo_alignment="left">
                     </div>
                 </div>
-                
+
                 <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
             </form>
 
@@ -354,7 +375,13 @@
                 return;
             }
 
-            const newUser = { email, password, fullName };
+            const newUser = { 
+                fullName, 
+                email, 
+                password,
+                isGoogleSignIn: false
+            };
+
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -365,27 +392,78 @@
         }
 
         function handleGoogleSignIn(response) {
-            // This is where you handle the Google Sign-In response
-            const user = {
-                fullName: response.credential.name,
-                email: response.credential.email,
-                isGoogleSignIn: true,
-                googleId: response.credential.sub,
-                profilePicture: response.credential.picture
-            };
-            
-            // Save user to localStorage
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Update UI and close modal
-            updateAuthUI(true);
-            document.getElementById('auth-modal').style.display = 'none';
-            
-            // Optional: Welcome message
-            alert(`Welcome ${user.fullName}! You've signed in with Google.`);
-            
-            // For production, you should send the credential to your backend for verification
-            // verifyGoogleToken(response.credential);
+            try {
+                if (!response.credential) {
+                    console.error('No credential in Google response');
+                    alert('Google sign-in failed. Please try again.');
+                    return;
+                }
+
+                // Decode the JWT to get user info
+                const decodeJwt = (token) => {
+                    try {
+                        const base64Url = token.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(
+                            atob(base64)
+                                .split('')
+                                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                                .join('')
+                        );
+                        return JSON.parse(jsonPayload);
+                    } catch (e) {
+                        console.error('Error decoding JWT:', e);
+                        return null;
+                    }
+                };
+
+                const decodedToken = decodeJwt(response.credential);
+
+                if (!decodedToken) {
+                    alert('Failed to process Google sign-in. Please try again.');
+                    return;
+                }
+
+                const googleEmail = decodedToken.email;
+
+                if (!googleEmail) {
+                    alert('Could not retrieve email from Google. Please try another method.');
+                    return;
+                }
+
+                // Check if user exists in our database
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                const existingUser = users.find(u => u.email === googleEmail);
+
+                if (!existingUser) {
+                    // User doesn't exist - show error and prompt to create account
+                    alert('No account found with this Google email. Please create an account first.');
+                    document.getElementById('auth-modal').style.display = 'block';
+                    document.getElementById('signin-form').style.display = 'none';
+                    document.getElementById('signup-form').style.display = 'block';
+                    document.getElementById('signup-email').value = googleEmail;
+                    document.getElementById('full-name').value = decodedToken.name || '';
+                    return;
+                }
+
+                // User exists - log them in
+                const userToLogin = {
+                    ...existingUser,
+                    isGoogleSignIn: true,
+                    profilePicture: decodedToken.picture || ''
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(userToLogin));
+                updateAuthUI(true);
+                document.getElementById('auth-modal').style.display = 'none';
+
+                // Welcome message
+                const welcomeName = existingUser.fullName || 'User';
+                alert(`Welcome back ${welcomeName}! You're now signed in.`);
+            } catch (error) {
+                console.error('Error in Google sign-in:', error);
+                alert('An error occurred during Google sign-in. Please try again.');
+            }
         }
 
         function checkAuthStatus() {
@@ -393,6 +471,7 @@
                 const user = localStorage.getItem('currentUser');
                 updateAuthUI(!!user);
             } catch (e) {
+                console.error('Error checking auth status:', e);
                 updateAuthUI(false);
             }
         }
@@ -410,12 +489,13 @@
                     try {
                         const user = JSON.parse(localStorage.getItem('currentUser'));
                         if (user) {
-                            // Set initials for avatar or use Google profile picture
+                            // Set avatar - use Google picture if available, otherwise initials
                             if (user.isGoogleSignIn && user.profilePicture) {
-                                userAvatar.innerHTML = `<img src="${user.profilePicture}" alt="Profile" style="border-radius: 50%; width: 32px; height: 32px;">`;
+                                userAvatar.innerHTML = `<img src="${user.profilePicture}" alt="Profile">`;
                             } else {
                                 const initials = user.fullName ? 
-                                    user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
+                                    user.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                                    'US';
                                 userAvatar.textContent = initials;
                             }
 
@@ -423,34 +503,16 @@
                             accountText.textContent = user.fullName || 'My Account';
                         }
                     } catch (e) {
-                        userAvatar.textContent = 'JD';
+                        console.error('Error updating auth UI:', e);
+                        userAvatar.textContent = 'US';
                         accountText.textContent = 'My Account';
                     }
                 }
             }
         }
 
-        // Optional: Function to verify Google token on your backend
-        async function verifyGoogleToken(credential) {
-            try {
-                const response = await fetch('/api/verify-google-token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ credential })
-                });
-                
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Verification failed');
-                
-                // Handle successful verification
-                console.log('Google token verified', data);
-            } catch (error) {
-                console.error('Error verifying Google token:', error);
-                // Handle error (e.g., show error message to user)
-            }
-        }
+        // Make handleGoogleSignIn available globally
+        window.handleGoogleSignIn = handleGoogleSignIn;
     </script>
 </body>
 </html>

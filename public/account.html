@@ -6,12 +6,316 @@
     <title>My Account - Modded Motor Market</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Account Container Styles */
+        .account-container {
+            display: flex;
+            min-height: calc(100vh - 120px);
+            margin-top: 20px;
+            gap: 20px;
+        }
 
+        /* Sidebar Styles */
+        .account-sidebar {
+            width: 280px;
+            min-width: 280px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .user-profile {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-profile h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .user-profile p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* Sidebar Navigation - Orange Theme */
+        .account-sidebar nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .account-sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .account-sidebar nav li {
+            margin: 0;
+        }
+
+        .account-sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .account-sidebar nav a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .account-sidebar nav a:hover {
+            background: #ffe8d6; /* Light orange hover */
+        }
+
+        .account-sidebar nav a.active {
+            background: #ff7b25; /* Your orange color */
+            color: white;
+        }
+
+        /* Orange buttons throughout the interface */
+        .btn-primary {
+            background-color: #ff7b25;
+            border-color: #ff7b25;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e56a1b;
+            border-color: #e56a1b;
+        }
+
+        /* Content Area */
+        .account-content {
+            flex: 1;
+            padding: 0 20px 20px 0;
+            min-width: 0;
+        }
+
+        .account-section {
+            display: none;
+        }
+
+        .account-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        /* Messages Section Styles */
+        .messages-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .conversations-list {
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+
+        .conversation {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .conversation:hover {
+            background-color: #f9f9f9;
+        }
+
+        .conversation.active {
+            background-color: #fff4e8;
+        }
+
+        .conversation.unread {
+            background-color: #f0f7ff;
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .conversation-header strong {
+            font-weight: 600;
+        }
+
+        .preview {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time {
+            color: #999;
+            font-size: 0.8rem;
+            text-align: right;
+        }
+
+        .message-view {
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+        }
+
+        .message-header {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.sent {
+            background-color: #ff7b25;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background-color: white;
+            border: 1px solid #ddd;
+            margin-right: auto;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message-input-container {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            min-height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .send-message-btn {
+            width: 100%;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 10px 0;
+            color: #444;
+        }
+
+        .empty-state p {
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .account-container {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .account-sidebar {
+                width: 100%;
+                min-width: auto;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+                padding: 15px;
+            }
+
+            .account-content {
+                padding: 20px;
+            }
+
+            .messages-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .conversations-list {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                max-height: 300px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav>
         <div class="nav-brand">
-            <img src="MMM.jpg" alt="Modded Motor Market Logo">
             <div class="logo"></div>
         </div>
 
@@ -250,6 +554,9 @@
                 if (!listing.hasOwnProperty('createdAt')) {
                     listing.createdAt = new Date().toISOString();
                 }
+                if (!listing.hasOwnProperty('coverPhotoIndex')) {
+                    listing.coverPhotoIndex = 0;
+                }
                 return listing;
             });
             localStorage.setItem('listings', JSON.stringify(updatedListings));
@@ -302,14 +609,13 @@
                     const card = document.createElement('div');
                     card.className = 'listing-card';
                     card.innerHTML = `
-                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}">
+                        <img src="${listing.photos[listing.coverPhotoIndex || 0]}" alt="${listing.make} ${listing.model}">
                         <div class="listing-info">
                             <h3>${listing.year} ${listing.make} ${listing.model}</h3>
                             <p class="price">$${listing.price.toLocaleString()}</p>
                             <p>${listing.mileage.toLocaleString()} miles</p>
                             <p>${listing.location || 'Location not specified'}</p>
                             <div class="listing-actions">
-                                <button class="btn" onclick="viewListing('${listing.id}')">View</button>
                                 <button class="btn btn-danger" onclick="removeSavedListing('${listing.id}')">Remove</button>
                             </div>
                         </div>
@@ -348,7 +654,7 @@
                     const card = document.createElement('div');
                     card.className = 'listing-card';
                     card.innerHTML = `
-                        <img src="${listing.photos[0]}" alt="${listing.make} ${listing.model}">
+                        <img src="${listing.photos[listing.coverPhotoIndex || 0]}" alt="${listing.make} ${listing.model}">
                         <div class="listing-info">
                             <h3>${listing.year} ${listing.make} ${listing.model} 
                                 <span class="status-badge ${statusClass}">${statusText}</span>
@@ -358,7 +664,6 @@
                             <p>${listing.condition}</p>
                             <p>${listing.modifications}</p>
                             <div class="listing-actions">
-                                <button class="btn" onclick="viewListing('${listing.id}')">View</button>
                                 ${!listing.isSold ? `
                                     ${listing.status === 'pending' ? `
                                         <button class="btn btn-warning" onclick="unmarkAsPending('${listing.id}')">
@@ -621,12 +926,24 @@
         function checkUrlForSection() {
             const urlParams = new URLSearchParams(window.location.search);
             const section = urlParams.get('section');
+            const conversationId = urlParams.get('conversation');
 
             if (section) {
                 document.querySelector('.account-sidebar nav a.active').classList.remove('active');
                 document.querySelector(`.account-sidebar nav a[data-section="${section}"]`).classList.add('active');
                 document.querySelector('.account-section.active').classList.remove('active');
                 document.getElementById(section + '-section').classList.add('active');
+            }
+
+            if (conversationId) {
+                // Load messages section and open the conversation
+                const conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+                const conversation = conversations.find(c => c.id === conversationId);
+                
+                if (conversation) {
+                    const isSeller = conversation.sellerId === currentUser.email;
+                    showConversation(conversation, isSeller);
+                }
             }
         }
 

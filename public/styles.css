@@ -1,3 +1,7 @@
+
+
+
+
 /* General Styles */
 body {
     margin: 0;
@@ -174,7 +178,7 @@ nav {
     text-align: center;
     padding: 120px 5%;
     margin-top: -80px; /* Offset navbar height */
-    max-width: 1600px;
+    max-width: 1800px;
 
 
 }

@@ -9,7 +9,20 @@
     <!-- Add Google Identity Services script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
+        footer {
+            margin-top: auto;
+        }
 
+        .sellyourcar {
+            flex: 1;
+            padding: 20px;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
         /* Vertical grid layout - thumbnails flow downward */
         .thumbnail-container {
             display: grid;
@@ -56,7 +69,54 @@
 
 
 
+        /* Social Login Styles */
+        .social-login {
+            margin: 20px 0;
+            text-align: center;
+        }
 
+        .g_id_signin {
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider-text {
+            padding: 0 10px;
+            color: #777;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4a6fa5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
 
 
@@ -356,10 +416,7 @@
                 </div>
             </li>
 
-            <button id="auth-button">
-                <i class="fas fa-user"></i>
-                <span>Sign In</span>
-            </button>
+        
         </ul>
     </nav>
 
@@ -460,6 +517,29 @@
                     <input type="password" id="modal-password" required>
                 </div>
                 <button type="submit">Sign In</button>
+
+                <div class="divider">
+                    <span class="divider-text">or</span>
+                </div>
+
+                <div class="social-login">
+                    <div id="g_id_onload"
+                         data-client_id="685654434134-h0nmsv0e4p0q6pcdgtspnbq7uhlj09qj.apps.googleusercontent.com"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-shape="rectangular"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
+
                 <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
             </form>
 
@@ -550,6 +630,103 @@
 
     <!-- JavaScript -->
     <script>
+
+
+
+
+        // Add this to your existing JavaScript
+        function handleGoogleSignIn(response) {
+            try {
+                if (!response.credential) {
+                    console.error('No credential in Google response');
+                    alert('Google sign-in failed. Please try again.');
+                    return;
+                }
+
+                // Decode the JWT to get user info
+                const decodeJwt = (token) => {
+                    try {
+                        const base64Url = token.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(
+                            atob(base64)
+                                .split('')
+                                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                                .join('')
+                        );
+                        return JSON.parse(jsonPayload);
+                    } catch (e) {
+                        console.error('Error decoding JWT:', e);
+                        return null;
+                    }
+                };
+
+                const decodedToken = decodeJwt(response.credential);
+                const googleEmail = decodedToken.email;
+                const googleName = decodedToken.name;
+                const googlePicture = decodedToken.picture;
+
+                // Check if user exists in our database
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                let user = users.find(u => u.email === googleEmail);
+
+                if (!user) {
+                    // Create new user with Google info
+                    user = {
+                        fullName: googleName,
+                        email: googleEmail,
+                        isGoogleSignIn: true,
+                        profilePicture: googlePicture
+                    };
+                    users.push(user);
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+
+                // Save current user
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                checkAuthStatus();
+                document.getElementById('auth-modal').style.display = 'none';
+
+                alert(`Welcome ${googleName || 'User'}! You're now signed in.`);
+            } catch (error) {
+                console.error('Error in Google sign-in:', error);
+                alert('An error occurred during Google sign-in. Please try again.');
+            }
+        }
+
+        // Make the function available globally
+        window.handleGoogleSignIn = handleGoogleSignIn;
+
+        // Update your checkAuthStatus function to handle Google users:
+        function checkAuthStatus() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userAvatar = document.getElementById('userAvatar');
+            const accountText = document.getElementById('accountText');
+
+            if (currentUser) {
+                // Update avatar - use Google picture if available
+                if (currentUser.isGoogleSignIn && currentUser.profilePicture) {
+                    userAvatar.innerHTML = `<img src="${currentUser.profilePicture}" alt="Profile">`;
+                } else {
+                    const initials = currentUser.fullName ? 
+                        currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                        'US';
+                    userAvatar.textContent = initials;
+                }
+
+                accountText.textContent = currentUser.fullName || 'My Account';
+                document.getElementById('login-required').style.display = 'none';
+                document.getElementById('sellCarForm').style.display = 'grid';
+            } else {
+                document.getElementById('login-required').style.display = 'block';
+                document.getElementById('sellCarForm').style.display = 'none';
+            }
+        }
+
+
+
+
+        
         document.addEventListener("DOMContentLoaded", function () {
             // Initialize mobile menu
             const menuToggle = document.getElementById('menuToggle');

@@ -1,4 +1,5 @@
 Deployment (Replit)
+
 This project is hosted on Replit and requires zero setup to run:
 
 Click the "Run" button in the Replit interface
@@ -7,11 +8,13 @@ Wait for the project to initialize (usually 5-10 seconds)
 
 Access the live site in the built-in browser window
 
+
 -OR-
+
 
 If you want to run locally instead of using Replit:
 
-Download the ZIP from Replit
+Download the ZIP from Replit or the ZIP file attatched to this repository
 
 Extract ALL files to same folder
 
@@ -39,6 +42,7 @@ AI Usage Disclosure:
 
 This project utilized DeepSeek Chat abd ChatGPT for:
 
+
 HTML ideas and CSS styling improvements (filter section)
 
 Filling database tables in SQLite3 for time purposes
@@ -49,12 +53,17 @@ JavaScript suggestions
 
 Basic understanding of APIs and authentication in order to understand what they were for implementation
 
+Also introduced us to modals and how to use them
 
-Key Prompts Used:
+(This was across all pages)
+
+
+
+Prompts Used:
 
 "Make the filters section cleaner without changing functionality"
 
 "How to make this modal more user-friendly"
 
-
+"complete this databse table to include all Germna cars (models/makes)"
 

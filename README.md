@@ -1,18 +1,5 @@
 Deployment (Replit)
 
-This project is hosted on Replit and requires zero setup to run:
-
-Click the "Run" button in the Replit interface
-
-Wait for the project to initialize (usually 5-10 seconds)
-
-Access the live site in the built-in browser window
-
-
--OR-
-
-
-If you want to run locally instead of using Replit:
 
 Download the ZIP from Replit or the ZIP file attatched to this repository
 
@@ -24,10 +11,7 @@ Open index.html in any modern web browser
 
 All functionality works client-side with no server needed
 
-
-
-
-
+(Keep in mind AuthO may not work given you are not granted a URI)
 
 
 
@@ -65,5 +49,8 @@ Prompts Used:
 
 "How to make this modal more user-friendly"
 
-"complete this databse table to include all Germna cars (models/makes)"
+"Complete this databse table to include all Germna cars (models/makes)"
 
+"Explain what an API is, give me API examples, and explain how to implement the API into my backend"
+
+**Some AI was used months ago, and therefore, prompts were not saved, but they generically include the ones stated above

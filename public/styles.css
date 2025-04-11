@@ -1,8 +1,4 @@
 
-
-
-
-/* General Styles */
 body {
     margin: 0;
     font-family: 'Urbanist', 'Arial', sans-serif;
@@ -11,7 +7,6 @@ body {
     background-color: #f9f9f9;
 }
 
-/* Navigation Bar */
 nav {
     background-color: #1a1a1a;
     color: white;
@@ -127,7 +122,6 @@ nav {
     margin-right: 8px;
 }
 
-/* Mobile Menu Toggle */
 .menu-toggle {
     display: none;
     background: none;
@@ -137,7 +131,6 @@ nav {
     cursor: pointer;
 }
 
-/* Dropdown Menu */
 .dropdown {
     position: relative;
 }
@@ -171,13 +164,12 @@ nav {
     display: block;
 }
 
-/* Hero Section */
 .hero-section {
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://cdn.bmwblog.com/wp-content/uploads/2020/07/BMW-M4-GTS-yellow-color-12.jpg') no-repeat center center/cover;
     color: white;
     text-align: center;
     padding: 120px 5%;
-    margin-top: -80px; /* Offset navbar height */
+    margin-top: -80px; 
     max-width: 1800px;
 
 
@@ -213,7 +205,6 @@ nav {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Main Content Styles */
 section {
     padding: 60px 5%;
     max-width: 1200px;
@@ -224,7 +215,6 @@ h1, h2 {
     color: #2c3e50;
 }
 
-/* About Us, Mission, Why Choose Us Sections */
 .about-section, .mission-section, .why-choose-us-section {
     background-color: white;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -253,7 +243,6 @@ h1, h2 {
     top: -5px;
 }
 
-/* Call to Action Section */
 .cta-section {
     text-align: center;
     background-color: #2c3e50;
@@ -266,7 +255,6 @@ h1, h2 {
     color: white;
 }
 
-/* Used Cars Section */
 .used-cars {
     padding: 40px 5%;
     text-align: center;
@@ -321,7 +309,6 @@ h1, h2 {
     color: #666;
 }
 
-/* Filter Section Styles */
 .filter-section, .sellyourcar {
     background: white;
     padding: 20px;
@@ -388,7 +375,6 @@ h1, h2 {
     background-color: #0056b3;
 }
 
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -431,7 +417,6 @@ h1, h2 {
     transform: scale(1.1);
 }
 
-/* Auth Form Styles */
 #signin-form, #signup-form {
     display: flex;
     flex-direction: column;
@@ -483,7 +468,6 @@ h1, h2 {
     text-decoration: underline;
 }
 
-/* Listing Details Modal Styles */
 #details-modal .modal-content {
     max-width: 600px;
 }
@@ -526,7 +510,6 @@ h1, h2 {
     margin-bottom: 5px;
 }
 
-/* Footer */
 footer {
     background-color: #1a1a1a;
     color: white;
@@ -535,14 +518,7 @@ footer {
     margin-top: 60px;
 }
 
-/* Account Page Specific Styles */
 
-
-
-
-
-
-/* Saved Listings */
 .saved-listings {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -600,7 +576,6 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Messages */
 .messages-container {
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -727,7 +702,6 @@ footer {
     background: #e05500;
 }
 
-/* Account Settings */
 .account-settings form {
     max-width: 600px;
 }
@@ -795,7 +769,6 @@ footer {
     transform: translateY(-2px);
 }
 
-/* Listing Status Badges */
 .status-badge {
     display: inline-block;
     padding: 3px 8px;
@@ -820,13 +793,11 @@ footer {
     color: white;
 }
 
-/* Animation */
 @keyframes modalopen {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive Styles */
 @media (max-width: 992px) {
     .nav-links {
         position: fixed;
@@ -898,13 +869,6 @@ footer {
     }
 }
 
-
-
-
-
-
-
-    /* Navbar Styles */
     nav {
         background-color: #1a1a1a;
         color: white;
@@ -1020,7 +984,6 @@ footer {
         margin-right: 8px;
     }
 
-    /* Mobile Menu Toggle */
     .menu-toggle {
         display: none;
         background: none;
@@ -1030,7 +993,6 @@ footer {
         cursor: pointer;
     }
 
-    /* Dropdown Menu */
     .dropdown {
         position: relative;
     }
@@ -1064,7 +1026,6 @@ footer {
         display: block;
     }
 
-    /* Responsive Styles */
     @media (max-width: 992px) {
         .nav-links {
             position: fixed;
@@ -1104,7 +1065,6 @@ footer {
         }
     }
 
-    /* Main Content Styles */
     body {
         margin: 0;
         font-family: 'Arial', sans-serif;
@@ -1113,7 +1073,6 @@ footer {
         background-color: #f9f9f9;
     }
 
-    /* Form Container */
     .sellyourcar {
         max-width: 800px;
         margin: 40px auto;
@@ -1130,14 +1089,12 @@ footer {
         margin-bottom: 30px;
     }
 
-    /* Form Layout */
     #sellCarForm {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
     }
 
-    /* Full-width elements */
     #description,
     #photo-upload-area,
     #submit-button,
@@ -1145,7 +1102,6 @@ footer {
         grid-column: span 2;
     }
 
-    /* Form Elements */
     #sellCarForm label {
         font-weight: bold;
         display: block;
@@ -1169,7 +1125,6 @@ footer {
         resize: vertical;
     }
 
-    /* Photo Upload */
     #photo-upload-area {
         border: 2px dashed #ddd;
         padding: 20px;
@@ -1215,7 +1170,6 @@ footer {
         margin-top: 10px;
     }
 
-    /* Submit Button */
     #submit-button {
         background-color: #ff5e00;
         color: white;
@@ -1233,7 +1187,6 @@ footer {
         background-color: #e05500;
     }
 
-    /* Login Prompt */
     .login-required {
         background: #f8f8f8;
         padding: 20px;
@@ -1258,7 +1211,6 @@ footer {
         background: #ff5e00;
     }
 
-    /* Modal Styles (unchanged from original) */
     .auth-modal {
         display: none;
         position: fixed;
@@ -1344,7 +1296,6 @@ footer {
         display: none;
     }
 
-    /* Preview Modal */
     #listing-preview {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1396,7 +1347,6 @@ footer {
         flex: 1;
     }
 
-    /* Footer */
     footer {
         background-color: #1a1a1a;
         color: white;
@@ -1405,7 +1355,6 @@ footer {
         margin-top: 60px;
     }
 
-    /* Responsive Adjustments */
     @media (max-width: 768px) {
         #sellCarForm {
             grid-template-columns: 1fr;
@@ -1420,18 +1369,6 @@ footer {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-<style>
-    /* Swipeable gallery styles */
     .listing-image-container {
         position: relative;
         height: 300px;
@@ -1513,12 +1450,10 @@ footer {
         border-color: #4CAF50;
     }
 
-    /* Touch support for swiping */
     .listing-image-container {
         touch-action: pan-y;
     }
 
-    /* Clear filters button style */
     .clear-filters {
         background-color: #666;
         color: white;
@@ -1533,14 +1468,12 @@ footer {
         background-color: #555;
     }
 
-    /* Filter buttons container */
     .filter-buttons {
         display: flex;
         justify-content: center;
         margin-top: 10px;
     }
 
-    /* Status badges */
     .status-badge {
         padding: 3px 8px;
         border-radius: 12px;
@@ -1551,18 +1484,17 @@ footer {
     }
 
     .status-pending {
-        background-color: #FFA500; /* Orange for pending */
+        background-color: #FFA500; 
     }
 
     .status-sold {
-        background-color: #FF0000; /* Red for sold */
+        background-color: #FF0000; 
     }
 
     .status-active {
-        background-color: #4CAF50; /* Green for active */
+        background-color: #4CAF50; 
     }
 
-    /* Save listing button */
     .save-listing-btn {
         position: absolute;
         top: 10px;
@@ -1592,35 +1524,9 @@ footer {
     .save-listing-btn.saved i {
         font-weight: 900; /* Makes it solid */
     }
-</style>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<style>
-    /* Account container styles */
     .account-container {
         display: flex;
         max-width: 1200px;
@@ -1631,7 +1537,6 @@ footer {
         overflow: hidden;
     }
 
-    /* Sidebar styles */
     .account-sidebar {
         width: 250px;
         background-color: #2c3e50;
@@ -1689,7 +1594,6 @@ footer {
         text-align: center;
     }
 
-    /* Main content styles */
     .account-content {
         flex: 1;
         padding: 20px;
@@ -1717,7 +1621,6 @@ footer {
         color: #2c3e50;
     }
 
-    /* Dashboard styles */
     .dashboard-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1778,7 +1681,6 @@ footer {
         font-size: 12px;
     }
 
-    /* Listing cards styles */
     .saved-listings {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1831,7 +1733,6 @@ footer {
         margin-top: 15px;
     }
 
-    /* Button styles */
     .btn {
         padding: 8px 15px;
         border: none;
@@ -1878,7 +1779,6 @@ footer {
         background-color: #34495e;
     }
 
-    /* Status badges */
     .status-badge {
         padding: 3px 8px;
         border-radius: 12px;
@@ -1900,7 +1800,6 @@ footer {
         background-color: #27ae60;
     }
 
-    /* Messages styles */
     .messages-container {
         display: flex;
         gap: 20px;
@@ -2036,7 +1935,6 @@ footer {
         padding: 10px 20px;
     }
 
-    /* Account settings styles */
     .account-settings {
         max-width: 600px;
         margin: 0 auto;
@@ -2087,7 +1985,6 @@ footer {
         margin-top: 0;
     }
 
-    /* Empty state styles */
     .empty-state {
         text-align: center;
         padding: 40px 20px;
@@ -2100,7 +1997,6 @@ footer {
         color: #bdc3c7;
     }
 
-    /* Responsive styles */
     @media (max-width: 768px) {
         .account-container {
             flex-direction: column;
@@ -2129,14 +2025,4 @@ footer {
             grid-template-columns: 1fr;
         }
     }
-</style>
-
-
-
-
-
-
-
-
-
 

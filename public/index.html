@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* Social Login Styles */
         .social-login {
             margin: 20px 0;
             text-align: center;
@@ -19,7 +18,6 @@
             width: fit-content;
         }
 
-        /* Modal adjustments for Google button */
         .modal-content {
             width: 350px;
             max-width: 90%;
@@ -42,7 +40,6 @@
             color: #777;
         }
 
-        /* User avatar styles */
         .user-avatar {
             width: 32px;
             height: 32px;
@@ -104,12 +101,10 @@
         </ul>
     </nav>
 
-    <!-- Auth Modal -->
     <div id="auth-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
 
-            <!-- Sign In Form -->
             <form id="signin-form">
                 <h2>Sign In</h2>
                 <div>
@@ -147,7 +142,6 @@
                 <p class="form-switch">Don't have an account? <a href="#" id="switch-to-signup">Create Account</a></p>
             </form>
 
-            <!-- Sign Up Form (hidden by default) -->
             <form id="signup-form" style="display: none;">
                 <h2>Create Account</h2>
                 <div>
@@ -229,13 +223,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize auth system
             initAuthSystem();
 
-            // Initialize mobile menu
             initMobileMenu();
 
-            // Debug check
             console.log('Page initialized');
         });
 
@@ -248,7 +239,6 @@
                 navLinks.classList.toggle('active');
             });
 
-            // Dropdown toggle for mobile
             if (accountDropdown) {
                 const accountLink = document.getElementById('account-link');
 
@@ -262,7 +252,6 @@
         }
 
         function initAuthSystem() {
-            // Get elements
             const authButton = document.getElementById('auth-button');
             const authModal = document.getElementById('auth-modal');
             const closeButton = document.querySelector('.close');
@@ -272,37 +261,31 @@
             const signupForm = document.getElementById('signup-form');
             const logoutBtn = document.getElementById('logout-btn');
 
-            // Toggle modal function
             function toggleModal(show) {
                 authModal.style.display = show ? 'block' : 'none';
                 document.body.style.overflow = show ? 'hidden' : 'auto';
             }
 
-            // Auth button click
             if (authButton) {
                 authButton.addEventListener('click', function() {
                     toggleModal(true);
-                    // Show sign-in form by default
                     if (signinForm) signinForm.style.display = 'block';
                     if (signupForm) signupForm.style.display = 'none';
                 });
             }
 
-            // Close button click
             if (closeButton) {
                 closeButton.addEventListener('click', function() {
                     toggleModal(false);
                 });
             }
 
-            // Close when clicking outside modal
             authModal.addEventListener('click', function(e) {
                 if (e.target === authModal) {
                     toggleModal(false);
                 }
             });
 
-            // Switch between forms
             if (switchToSignup && signinForm && signupForm) {
                 switchToSignup.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -319,7 +302,6 @@
                 });
             }
 
-            // Form submissions
             if (signinForm) {
                 signinForm.addEventListener('submit', handleSignIn);
             }
@@ -328,7 +310,6 @@
                 signupForm.addEventListener('submit', handleSignUp);
             }
 
-            // Logout functionality
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -338,7 +319,6 @@
                 });
             }
 
-            // Check auth status on load
             checkAuthStatus();
         }
 
@@ -399,7 +379,6 @@
                     return;
                 }
 
-                // Decode the JWT to get user info
                 const decodeJwt = (token) => {
                     try {
                         const base64Url = token.split('.')[1];
@@ -431,12 +410,10 @@
                     return;
                 }
 
-                // Check if user exists in our database
                 let users = JSON.parse(localStorage.getItem('users')) || [];
                 const existingUser = users.find(u => u.email === googleEmail);
 
                 if (!existingUser) {
-                    // User doesn't exist - show error and prompt to create account
                     alert('No account found with this Google email. Please create an account first.');
                     document.getElementById('auth-modal').style.display = 'block';
                     document.getElementById('signin-form').style.display = 'none';
@@ -446,7 +423,6 @@
                     return;
                 }
 
-                // User exists - log them in
                 const userToLogin = {
                     ...existingUser,
                     isGoogleSignIn: true,
@@ -457,7 +433,6 @@
                 updateAuthUI(true);
                 document.getElementById('auth-modal').style.display = 'none';
 
-                // Welcome message
                 const welcomeName = existingUser.fullName || 'User';
                 alert(`Welcome back ${welcomeName}! You're now signed in.`);
             } catch (error) {
@@ -489,7 +464,6 @@
                     try {
                         const user = JSON.parse(localStorage.getItem('currentUser'));
                         if (user) {
-                            // Set avatar - use Google picture if available, otherwise initials
                             if (user.isGoogleSignIn && user.profilePicture) {
                                 userAvatar.innerHTML = `<img src="${user.profilePicture}" alt="Profile">`;
                             } else {
@@ -499,7 +473,6 @@
                                 userAvatar.textContent = initials;
                             }
 
-                            // Set account name
                             accountText.textContent = user.fullName || 'My Account';
                         }
                     } catch (e) {
@@ -511,7 +484,6 @@
             }
         }
 
-        // Make handleGoogleSignIn available globally
         window.handleGoogleSignIn = handleGoogleSignIn;
     </script>
 </body>
